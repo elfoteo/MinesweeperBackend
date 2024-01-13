@@ -4,10 +4,9 @@ const AWS = require('aws-sdk');
 
 // Create an S3 instance
 const s3 = new AWS.S3();
-const bucketName = 'cyclic-bewildered-shoulder-pads-newt-eu-west-3';
-const s3Key = 'userdata.json'; // Set the key (filename) in S3
+const bucketName = 'cyclic-vast-hare-lab-coat-eu-west-3';
+const s3Key = 'data.json'; // Set the key (filename) in S3
 
-let loginCount = 0;
 let users = [];
 
 async function loadDataFromS3() {
@@ -18,9 +17,8 @@ async function loadDataFromS3() {
 
     try {
         const data = await s3.getObject(s3Params).promise();
-        const { loginCount: loadedLoginCount, users: loadedUsers } = JSON.parse(data.Body.toString());
+        const { users: loadedUsers } = JSON.parse(data.Body.toString());
 
-        loginCount = loadedLoginCount;
         users = loadedUsers;
 
         console.log('Data loaded from S3.');
@@ -33,7 +31,7 @@ async function saveDataToS3() {
     const s3Params = {
         Bucket: bucketName,
         Key: s3Key,
-        Body: JSON.stringify({ loginCount, users }),
+        Body: JSON.stringify({ users }),
         ContentType: 'application/json',
     };
 
@@ -57,17 +55,16 @@ function handleLogin(req, res) {
 
         if (username && score && time && difficulty) {
             users.push({ username, score, time, difficulty });
-            loginCount++;
             await saveDataToS3();
             res.writeHead(302, { 'Location': '/' });
             res.end();
         } else {
-            displayLoginForm(res, loginCount, 'Invalid input');
+            displayLoginForm(res, 'Invalid input');
         }
     });
 }
 
-async function displayLoginForm(res, count, message = '') {
+async function displayLoginForm(res, message = '') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.write(`
         <html>
@@ -76,7 +73,6 @@ async function displayLoginForm(res, count, message = '') {
         </head>
         <body>
             <h1>Login Counter</h1>
-            <p>Number of logins: ${count}</p>
             <p>${message}</p>
             <form method="post">
                 <label for="username">Username:</label>
@@ -117,7 +113,7 @@ function displayUsers(res) {
 
 function displayRawData(res) {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify({ loginCount, users }));
+    res.write(JSON.stringify({ users }));
     res.end();
 }
 
@@ -133,7 +129,6 @@ function handleSubmit(req, res) {
 
         if (username && score && time && difficulty) {
             users.push({ username, score, time, difficulty });
-            loginCount++;
             await saveDataToS3();
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.write(JSON.stringify({ success: true, message: 'Data submitted successfully.' }));
@@ -161,7 +156,7 @@ async function startServer() {
         } else if (req.url === '/raw') {
             displayRawData(res);
         } else {
-            displayLoginForm(res, loginCount);
+            displayLoginForm(res);
         }
     });
 

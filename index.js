@@ -55,6 +55,23 @@ function handleLogin(req, res) {
 
         if (username && score && time && difficulty) {
             users.push({ username, score, time, difficulty });
+
+            // Sort the users array based on the specified criteria
+            users = users.sort((a, b) => {
+                const difficultyComparison = b.difficulty.localeCompare(a.difficulty);
+                if (difficultyComparison === 0) {
+                    const scoreComparison = b.score - a.score;
+                    if (scoreComparison === 0) {
+                        return a.time - b.time;
+                    }
+                    return scoreComparison;
+                }
+                return difficultyComparison;
+            });
+
+            // Limit the users array to a size of 5
+            users = users.slice(0, 5);
+
             await saveDataToS3();
             res.writeHead(302, { 'Location': '/' });
             res.end();

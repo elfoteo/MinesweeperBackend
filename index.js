@@ -9,6 +9,12 @@ const s3Key = 'leaderboard.json'; // Set the key (filename) in S3
 
 let users = [];
 
+const MinesweeperDifficulty = {
+    EASY: 'EASY',
+    MEDIUM: 'MEDIUM',
+    HARD: 'HARD'
+};
+
 async function loadDataFromS3() {
     const s3Params = {
         Bucket: bucketName,
@@ -42,7 +48,6 @@ async function saveDataToS3() {
         console.error('Error saving data to S3:', error);
     }
 }
-
 function handleLogin(req, res) {
     let body = '';
     req.on('data', chunk => {
@@ -53,16 +58,22 @@ function handleLogin(req, res) {
         const formData = parse(body);
         const { username, score, time, difficulty } = formData;
 
-        if (username && score && time && difficulty) {
-            users.push({ username, score, time, difficulty });
+        // Convert difficulty string to MinesweeperDifficulty enum
+        const enumDifficulty = MinesweeperDifficulty[difficulty];
+
+        // Convert time string to total minutes
+        const totalMinutes = convertTimeToMinutes(time);
+
+        if (username && score && time && enumDifficulty) {
+            users.push({ username, score, time, difficulty: enumDifficulty });
 
             // Sort the users array based on the specified criteria
             users = users.sort((a, b) => {
-                const difficultyComparison = b.difficulty.localeCompare(a.difficulty);
+                const difficultyComparison = MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
                 if (difficultyComparison === 0) {
                     const scoreComparison = b.score - a.score;
                     if (scoreComparison === 0) {
-                        return a.time - b.time;
+                        return convertTimeToMinutes(a.time) - convertTimeToMinutes(b.time);
                     }
                     return scoreComparison;
                 }
@@ -79,6 +90,12 @@ function handleLogin(req, res) {
             displayLoginForm(res, 'Invalid input');
         }
     });
+}
+
+// Helper function to convert time string to total minutes
+function convertTimeToMinutes(time) {
+    const [hours, minutes] = time.split(':');
+    return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
 }
 
 async function displayLoginForm(res, message = '') {

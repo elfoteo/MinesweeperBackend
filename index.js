@@ -134,7 +134,7 @@ async function addUserForm(res, req) {
             // Check if the provided password is correct
             if (password === 'admin') {
                 try {
-                    await addUser(formData.username, formData.score, formData.difficulty);
+                    await addUser(formData.username, formData.score, formData.time, formData.difficulty);
 
                     res.writeHead(200, { 'Content-Type': 'text/plain' });
                     res.write('User added successfully.');
@@ -206,7 +206,6 @@ function handleSubmit(req, res) {
 }
 
 async function addUser(username, score, time, difficulty){
-    console.log(`Trying to add user: {Username: ${username}, Score: ${score}, Difficulty: ${difficulty}}`);
     try{
         difficulty = difficulty.toUpperCase();
         // Check if it is a valid difficulty level
@@ -225,7 +224,7 @@ async function addUser(username, score, time, difficulty){
     sortUsers();
 
     await saveDataToS3();
-    console.log(`Successfully added user with data: {Username: ${username}, Score: ${score}, Difficulty: ${difficulty}}`);
+    console.log(`Successfully added user with data: {Username: ${username}, Score: ${score}, Time: ${time}, Difficulty: ${difficulty}}`);
 }
 
 function sortUsers(){

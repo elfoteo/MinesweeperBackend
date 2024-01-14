@@ -203,6 +203,8 @@ async function startServer() {
         if (req.method === 'POST') {
             if (req.url === '/submit') {
                 handleSubmit(req, res);
+            } else if (req.url === '/manage') {
+                handleManage(req, res); // New route for managing data
             } else {
                 handleLogin(req, res);
             }
@@ -220,6 +222,67 @@ async function startServer() {
         console.log(`Server running at http://localhost:${PORT}/`);
     });
 }
+
+// New function to handle management requests
+function handleManage(req, res) {
+    if (req.url === '/manage' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            const formData = parse(body);
+            const password = formData.password;
+
+            // Check if the provided password is correct
+            if (password === 'admin') {
+                // Erase data from S3
+                try {
+                    await s3.deleteObject({
+                        Bucket: bucketName,
+                        Key: s3Key,
+                    }).promise();
+
+                    console.log('Data erased from S3.');
+                    res.writeHead(200, { 'Content-Type': 'text/plain' });
+                    res.write('Data erased from S3.');
+                    res.end();
+                } catch (error) {
+                    console.error('Error erasing data from S3:', error);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.write('Internal Server Error');
+                    res.end();
+                }
+            } else {
+                // Incorrect password
+                res.writeHead(401, { 'Content-Type': 'text/plain' });
+                res.write('Unauthorized');
+                res.end();
+            }
+        });
+    } else {
+        // Display the management form
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.write(`
+            <html>
+            <head>
+                <title>Data Management</title>
+            </head>
+            <body>
+                <h1>Data Management</h1>
+                <form method="post">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit">Login</button>
+                </form>
+            </body>
+            </html>
+        `);
+        res.end();
+    }
+}
+
 
 
 

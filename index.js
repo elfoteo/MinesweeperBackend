@@ -75,12 +75,12 @@ function handleLogin(req, res) {
                 if (difficultyComparison === 0) {
                     const scoreComparison = b.score - a.score;
                     if (scoreComparison === 0) {
+                        // Convert time to minutes for correct comparison
                         return convertTimeToMinutes(a.time) - convertTimeToMinutes(b.time);
                     }
                     return scoreComparison;
                 }
-                // Convert the string difficulty values to numbers for correct comparison
-                return MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
+                return difficultyComparison;
             });
             for (const user of users) {
                 console.log(`Username: ${user.username}, Score: ${user.score}, Time: ${user.time}, Difficulty: ${user.difficulty}`);

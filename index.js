@@ -128,9 +128,9 @@ async function addUserForm(res, req) {
             body += chunk.toString();
         });
 
+        const formData = parse(body);
+        const password = formData.password;
         req.on('end', async () => {
-            const formData = parse(body);
-            const password = formData.password;
 
             // Check if the provided password is correct
             if (password === 'admin') {
@@ -175,7 +175,7 @@ async function addUserForm(res, req) {
                     <input type="text" id="time" name="time" required>
                     <label for="difficulty">Difficulty:</label>
                     <input type="text" id="difficulty" name="difficulty" required>
-                    <button type="submit">Login</button>
+                    <button type="submit">Add user</button>
                 </form>
                 <p><a href="/users">View Users</a></p>
             </body>

@@ -257,6 +257,8 @@ function handleManage(req, res) {
                     res.write('Internal Server Error');
                     res.end();
                 }
+                // Empty the users array
+                users = [];
             } else {
                 // Incorrect password
                 res.writeHead(401, { 'Content-Type': 'text/plain' });

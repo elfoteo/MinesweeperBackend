@@ -120,7 +120,6 @@ function displayRawData(res) {
     res.write(JSON.stringify({ users }));
     res.end();
 }
-
 async function addUserForm(res, req) {
     if (req.method === 'POST') {
         let body = '';
@@ -128,9 +127,9 @@ async function addUserForm(res, req) {
             body += chunk.toString();
         });
 
-        const formData = parse(body);
-        const password = formData.password;
         req.on('end', async () => {
+            const formData = parse(body);
+            const password = formData.password;
 
             // Check if the provided password is correct
             if (password === 'admin') {
@@ -143,7 +142,6 @@ async function addUserForm(res, req) {
                 } catch (error) {
                     console.error('Error adding user:', error);
                     res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    // The user dosen't need to see the error, just the server manager
                     res.write('Internal Server Error');
                     res.end();
                 }
@@ -154,8 +152,7 @@ async function addUserForm(res, req) {
                 res.end();
             }
         });
-    }
-    else{
+    } else {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write(`
             <html>

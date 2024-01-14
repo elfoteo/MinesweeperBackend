@@ -121,7 +121,7 @@ function displayRawData(res) {
     res.end();
 }
 
-async function addUserForm(res) {
+async function addUserForm(res, req) {
     if (req.method === 'POST') {
         let body = '';
         req.on('data', chunk => {
@@ -250,7 +250,7 @@ async function startServer() {
             } else if (req.url === '/erase') {
                 eraseUsers(req, res);
             } else if (req.url === '/add'){
-                addUserForm(res);
+                addUserForm(res, req);
             } else {
                 displayRawData(req, res);
             }
@@ -262,7 +262,7 @@ async function startServer() {
         } else if (req.url === '/raw') {
             displayRawData(res);
         } else if (req.url === '/add') {
-            addUserForm(res);
+            addUserForm(res, req);
         } else {
             displayUsers(res);
         }

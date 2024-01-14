@@ -70,7 +70,7 @@ function handleLogin(req, res) {
             users.push({ username, score, time, difficulty: enumDifficulty });
         
             // Sort the users array based on the specified criteria
-            users = users.sort((a, b) => {
+            users.sort((a, b) => {
                 const difficultyComparison = MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
                 if (difficultyComparison === 0) {
                     const scoreComparison = b.score - a.score;

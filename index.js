@@ -82,7 +82,7 @@ function handleLogin(req, res) {
             res.writeHead(302, { 'Location': '/' });
             res.end();
         } else {
-            displayLoginForm(res, 'Invalid input');
+            addUserForm(res, 'Invalid input');
         }
 
     });
@@ -94,15 +94,15 @@ function convertTimeToMinutes(time) {
     return parseInt(minutes, 10) * 60 + parseInt(seconds, 10);
 }
 
-async function displayLoginForm(res, message = '') {
+async function addUserForm(res, message = '') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.write(`
         <html>
         <head>
-            <title>Login Counter</title>
+            <title>Add User</title>
         </head>
         <body>
-            <h1>Login Counter</h1>
+            <h1>Add</h1>
             <p>${message}</p>
             <form method="post">
                 <label for="username">Username:</label>
@@ -204,19 +204,23 @@ async function startServer() {
             if (req.url === '/submit') {
                 handleSubmit(req, res);
             } else if (req.url === '/erase') {
-                handleManage(req, res);
+                eraseUsers(req, res);
+            } else if (req.url === '/add'){
+                addUserForm(res);
             } else {
-                handleLogin(req, res);
+                displayRawData(req, res);
             }
         }
         else if (req.url === '/erase') {
-            handleManage(req, res);
+            eraseUsers(req, res);
         } else if (req.url === '/users') {
             displayUsers(res);
         } else if (req.url === '/raw') {
             displayRawData(res);
+        } else if (req.url === '/add') {
+            addUserForm(res);
         } else {
-            displayLoginForm(res);
+            displayUsers(res);
         }
     });
 
@@ -227,7 +231,7 @@ async function startServer() {
 }
 
 // New function to handle management requests
-function handleManage(req, res) {
+function eraseUsers(req, res) {
     if (req.url === '/erase' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => {

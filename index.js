@@ -137,18 +137,16 @@ async function addUserForm(res, req) {
                 try {
                     await addUser(formData.username, formData.score, formData.difficulty);
 
-                    console.log('Data erased from S3.');
                     res.writeHead(200, { 'Content-Type': 'text/plain' });
-                    res.write('Data erased from S3.');
+                    res.write('User added successfully.');
                     res.end();
                 } catch (error) {
-                    console.error('Error erasing data from S3:', error);
+                    console.error('Error adding user:', error);
                     res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    // The user dosen't need to see the error, just the server manager
                     res.write('Internal Server Error');
                     res.end();
                 }
-                // Empty the users array
-                users = [];
             } else {
                 // Incorrect password
                 res.writeHead(401, { 'Content-Type': 'text/plain' });
@@ -168,7 +166,7 @@ async function addUserForm(res, req) {
                 <h1>Add User</h1>
                 <form method="post">
                     <label for="password">Admin password:</label>
-                    <input type="text" id="password" name="password" required><br>
+                    <input type="password" id="password" name="password" required><br>
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" required>
                     <label for="score">Score:</label>
@@ -216,6 +214,7 @@ async function addUser(username, score, time, difficulty){
     sortUsers();
 
     await saveDataToS3();
+    console.log('Successfully added user with data: {Username:'+formData.username+', Score:'+formData.score+', Difficulty:'+formData.difficulty+'}');
 }
 
 function sortUsers(){

@@ -82,7 +82,9 @@ function handleLogin(req, res) {
                 // Convert the string difficulty values to numbers for correct comparison
                 return MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
             });
-        
+            for (const user of users) {
+                console.log(`Username: ${user.username}, Score: ${user.score}, Time: ${user.time}, Difficulty: ${user.difficulty}`);
+            }
             // Limit the users array to a size of 5
             users = users.slice(0, 5);
         

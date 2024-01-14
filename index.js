@@ -53,41 +53,6 @@ async function saveDataToS3() {
     }
 }
 
-
-function handleLogin(req, res) {
-    let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString();
-    });
-
-    req.on('end', async () => {
-        const formData = parse(body);
-        const { username, score, time, difficulty } = formData;
-        
-        // Convert difficulty string to MinesweeperDifficulty enum
-        const enumDifficulty = MinesweeperDifficulty[difficulty];
-        
-        // Convert time string to total minutes
-        const totalMinutes = convertTimeToMinutes(time);
-        console.log(totalMinutes);
-        console.log(enumDifficulty);
-        
-        if (username && score && time && enumDifficulty) {
-            users.push({ username, score, time, difficulty: enumDifficulty });
-        
-            // Sort the users
-            sortUsers();
-        
-            await saveDataToS3();
-            res.writeHead(302, { 'Location': '/' });
-            res.end();
-        } else {
-            addUserForm(res, 'Invalid input');
-        }
-
-    });
-}
-
 // Helper function to convert time string to total minutes input format: [mm:ss]
 function convertTimeToMinutes(time) {
     const [minutes, seconds] = time.split(':');
@@ -116,11 +81,8 @@ function displayUsers(res) {
 }
 
 function displayRawData(res) {
-    console.log('Users:');
-    for (const user in users)
-    {
-        console.log(`User: {Username: ${user.username}, Score: ${user.score}, Time: ${user.time}, Difficulty: ${user.difficulty}}`);
-    }
+    loadDataFromS3();
+    console.log('Users:'+users);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify({ users }));
     res.end();

@@ -82,7 +82,7 @@ function displayUsers(res) {
 
 function displayRawData(res) {
     loadDataFromS3();
-    console.log('Users:'+users);
+    console.log('Users:', users);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify({ users }));
     res.end();

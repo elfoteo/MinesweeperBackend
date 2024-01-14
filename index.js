@@ -203,10 +203,12 @@ async function startServer() {
         if (req.method === 'POST') {
             if (req.url === '/submit') {
                 handleSubmit(req, res);
-            }
+            } else if (req.url === '/manage') {
+                handleManage(req, res);
             } else {
                 handleLogin(req, res);
             }
+        }
         else if (req.url === '/manage') {
             handleManage(req, res);
         } else if (req.url === '/users') {

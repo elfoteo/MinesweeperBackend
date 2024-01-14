@@ -94,33 +94,7 @@ function convertTimeToMinutes(time) {
     return parseInt(minutes, 10) * 60 + parseInt(seconds, 10);
 }
 
-async function addUserForm(res, message = '') {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.write(`
-        <html>
-        <head>
-            <title>Add User</title>
-        </head>
-        <body>
-            <h1>Add</h1>
-            <p>${message}</p>
-            <form method="post">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="score">Score:</label>
-                <input type="text" id="score" name="score" required>
-                <label for="time">Time:</label>
-                <input type="text" id="time" name="time" required>
-                <label for="difficulty">Difficulty:</label>
-                <input type="text" id="difficulty" name="difficulty" required>
-                <button type="submit">Login</button>
-            </form>
-            <p><a href="/users">View Users</a></p>
-        </body>
-        </html>
-    `);
-    res.end();
-}
+
 
 function displayUsers(res) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -147,6 +121,72 @@ function displayRawData(res) {
     res.end();
 }
 
+async function addUserForm(res) {
+    if (req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            const formData = parse(body);
+            const password = formData.password;
+
+            // Check if the provided password is correct
+            if (password === 'admin') {
+                try {
+                    await addUser(formData.username, formData.score, formData.difficulty);
+
+                    console.log('Data erased from S3.');
+                    res.writeHead(200, { 'Content-Type': 'text/plain' });
+                    res.write('Data erased from S3.');
+                    res.end();
+                } catch (error) {
+                    console.error('Error erasing data from S3:', error);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.write('Internal Server Error');
+                    res.end();
+                }
+                // Empty the users array
+                users = [];
+            } else {
+                // Incorrect password
+                res.writeHead(401, { 'Content-Type': 'text/plain' });
+                res.write('Unauthorized');
+                res.end();
+            }
+        });
+    }
+    else{
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.write(`
+            <html>
+            <head>
+                <title>Add User</title>
+            </head>
+            <body>
+                <h1>Add User</h1>
+                <form method="post">
+                    <label for="password">Admin password:</label>
+                    <input type="text" id="password" name="password" required><br>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                    <label for="score">Score:</label>
+                    <input type="text" id="score" name="score" required>
+                    <label for="time">Time:</label>
+                    <input type="text" id="time" name="time" required>
+                    <label for="difficulty">Difficulty:</label>
+                    <input type="text" id="difficulty" name="difficulty" required>
+                    <button type="submit">Login</button>
+                </form>
+                <p><a href="/users">View Users</a></p>
+            </body>
+            </html>
+        `);
+        res.end();
+    }
+}
+
 function handleSubmit(req, res) {
     let body = '';
     req.on('data', chunk => {
@@ -158,11 +198,7 @@ function handleSubmit(req, res) {
         const { username, score, time, difficulty } = formData;
 
         if (username && score && time && difficulty) {
-            users.push({ username, score, time, difficulty });
-
-            sortUsers();
-
-            await saveDataToS3();
+            await addUser(username, score, time, difficulty);
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.write(JSON.stringify({ success: true, message: 'Data submitted successfully.' }));
             res.end();
@@ -172,6 +208,14 @@ function handleSubmit(req, res) {
             res.end();
         }
     });
+}
+
+async function addUser(username, score, time, difficulty){
+    users.push({ username, score, time, difficulty });
+
+    sortUsers();
+
+    await saveDataToS3();
 }
 
 function sortUsers(){

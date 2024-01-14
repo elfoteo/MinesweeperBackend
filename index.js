@@ -57,17 +57,18 @@ function handleLogin(req, res) {
     req.on('end', async () => {
         const formData = parse(body);
         const { username, score, time, difficulty } = formData;
-
+        
         // Convert difficulty string to MinesweeperDifficulty enum
         const enumDifficulty = MinesweeperDifficulty[difficulty];
-
+        
         // Convert time string to total minutes
         const totalMinutes = convertTimeToMinutes(time);
         console.log(totalMinutes);
         console.log(enumDifficulty);
+        
         if (username && score && time && enumDifficulty) {
             users.push({ username, score, time, difficulty: enumDifficulty });
-
+        
             // Sort the users array based on the specified criteria
             users = users.sort((a, b) => {
                 const difficultyComparison = MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
@@ -78,18 +79,20 @@ function handleLogin(req, res) {
                     }
                     return scoreComparison;
                 }
-                return difficultyComparison;
+                // Convert the string difficulty values to numbers for correct comparison
+                return MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
             });
-
+        
             // Limit the users array to a size of 5
             users = users.slice(0, 5);
-
+        
             await saveDataToS3();
             res.writeHead(302, { 'Location': '/' });
             res.end();
         } else {
             displayLoginForm(res, 'Invalid input');
         }
+
     });
 }
 

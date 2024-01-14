@@ -71,7 +71,7 @@ function handleLogin(req, res) {
         
             // Sort the users array based on the specified criteria
             users.sort((a, b) => {
-                const difficultyComparison = MinesweeperDifficulty[b.difficulty] - MinesweeperDifficulty[a.difficulty];
+                const difficultyComparison = Object.keys(MinesweeperDifficulty).indexOf(b.difficulty) - Object.keys(MinesweeperDifficulty).indexOf(a.difficulty);
                 console.log("Diff comp: "+difficultyComparison)
                 if (difficultyComparison === 0 && false) {
                     const scoreComparison = b.score - a.score;

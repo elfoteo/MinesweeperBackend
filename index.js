@@ -206,12 +206,18 @@ function handleSubmit(req, res) {
 }
 
 async function addUser(username, score, time, difficulty){
+    difficulty = difficulty.toUpperCase();
+    // Check if it is a valid difficulty level
+    if (!(difficulty in MinesweeperDifficulty)){
+        // If not set to default 'EASY'
+        difficulty = 'EASY';
+    }
     users.push({ username, score, time, difficulty });
 
     sortUsers();
 
     await saveDataToS3();
-    console.log('Successfully added user with data: {Username:'+formData.username+', Score:'+formData.score+', Difficulty:'+formData.difficulty+'}');
+    console.log(`Successfully added user with data: {Username: ${username}, Score: ${score}, Difficulty: ${difficulty}}`);
 }
 
 function sortUsers(){

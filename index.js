@@ -203,13 +203,13 @@ async function startServer() {
         if (req.method === 'POST') {
             if (req.url === '/submit') {
                 handleSubmit(req, res);
-            } else if (req.url === '/manage') {
+            } else if (req.url === '/erase') {
                 handleManage(req, res);
             } else {
                 handleLogin(req, res);
             }
         }
-        else if (req.url === '/manage') {
+        else if (req.url === '/erase') {
             handleManage(req, res);
         } else if (req.url === '/users') {
             displayUsers(res);
@@ -228,7 +228,7 @@ async function startServer() {
 
 // New function to handle management requests
 function handleManage(req, res) {
-    if (req.url === '/manage' && req.method === 'POST') {
+    if (req.url === '/erase' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -272,14 +272,14 @@ function handleManage(req, res) {
         res.write(`
             <html>
             <head>
-                <title>Data Management</title>
+                <title>Erase all data</title>
             </head>
             <body>
-                <h1>Data Management</h1>
+                <h1>Erase all data</h1>
                 <form method="post">
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" required>
-                    <button type="submit">Login</button>
+                    <button type="submit">Erase</button>
                 </form>
             </body>
             </html>

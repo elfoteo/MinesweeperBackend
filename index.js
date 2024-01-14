@@ -5,7 +5,7 @@ const AWS = require('aws-sdk');
 // Create an AWS S3 instance
 const s3 = new AWS.S3();
 // Constants for AWS S3 configuration
-const bucketName = 'cyclic-vast-hare-lab-coat-eu-west-3';
+const bucketName = 'cyclic-ill-ray-ring-eu-west-2';
 const s3Key = 'leaderboard.json'; // Set the key (filename) in S3
 
 let users = [];

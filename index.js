@@ -116,6 +116,11 @@ function displayUsers(res) {
 }
 
 function displayRawData(res) {
+    console.log('Users:');
+    for (const user in users)
+    {
+        console.log(`User: {Username: ${user.username}, Score: ${user.score}, Time: ${user.time}, Difficulty: ${user.difficulty}}`);
+    }
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify({ users }));
     res.end();

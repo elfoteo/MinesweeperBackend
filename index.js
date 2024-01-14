@@ -63,7 +63,8 @@ function handleLogin(req, res) {
 
         // Convert time string to total minutes
         const totalMinutes = convertTimeToMinutes(time);
-
+        alert(totalMinutes)
+        alert(enumDifficulty)
         if (username && score && time && enumDifficulty) {
             users.push({ username, score, time, difficulty: enumDifficulty });
 

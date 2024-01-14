@@ -2,7 +2,7 @@ const http = require('http');
 const { parse } = require('querystring');
 const AWS = require('aws-sdk');
 
-// Create an S3 instance
+// Create an AWS S3 instance
 const s3 = new AWS.S3();
 // Constants for AWS S3 configuration
 const bucketName = 'cyclic-vast-hare-lab-coat-eu-west-3';
